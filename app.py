@@ -746,24 +746,21 @@ import os
 
 app = Flask(__name__)
 
-# ✅ Vercel env variable (production)
+# ✅ Vercel env variable
 SERP_API_KEY = os.environ.get("SERP_API_KEY")
 
-# 👉 Local testing ke liye fallback
+# 👉 Local testing fallback
 if not SERP_API_KEY:
-    SERP_API_KEY = "20518f671f85fe023c84f04664ebf78be13b63560729f225b395d6d099344154"  
+    SERP_API_KEY = "YOUR_SERP_API_KEY_HERE"
 
-# simple usage counter
 usage_count = 0
 
 
-# ✅ Homepage
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# ✅ Rank API
 @app.route("/api/rank")
 def get_rank():
     global usage_count
@@ -779,27 +776,32 @@ def get_rank():
 
     url = "https://serpapi.com/search.json"
 
-    # 🔥 COUNTRY DETECTION (IMPORTANT)
+    # 🔥 COUNTRY DETECTION
     if "United States" in location:
         gl = "us"
     else:
         gl = "ca"
 
-    # ✅ FINAL ACCURATE PARAMS
     params = {
         "q": keyword,
         "api_key": SERP_API_KEY,
-        "location": location,      # city-level accuracy
-        "gl": gl,                  # country fix
-        "hl": "en",                # language
-        "device": device,          # mobile/desktop
+        "location": location,
+        "gl": gl,
+        "hl": "en",
+        "device": device,
         "engine": "google",
-        "num": 100                 # top 100 results
+        "num": 100
     }
 
     try:
         res = requests.get(url, params=params)
         data = res.json()
+
+        # 🔍 DEBUG (optional)
+        print("\n--- DEBUG RESULTS ---")
+        if "organic_results" in data:
+            for r in data["organic_results"][:20]:
+                print(r.get("position"), r.get("link"))
 
         rank = "Not found"
 
@@ -823,5 +825,5 @@ def get_rank():
         })
 
 
-# ❌ Vercel ke liye app.run() nahi chahiye
+
 app = app
