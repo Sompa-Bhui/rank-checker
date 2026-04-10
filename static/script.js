@@ -2,7 +2,10 @@ async function loadCities() {
   let country = document.getElementById("country").value;
 
   try {
-    let res = await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${country}&type=city&limit=10&apiKey=9b035938a53443d4bf651c7a47f607a1`);
+    // ✅ FIXED LINE (IMPORTANT)
+    let countryCode = country === "United States" ? "us" : "ca";
+
+    let res = await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=&filter=countrycode:${countryCode}&type=city&limit=20&apiKey=9b035938a53443d4bf651c7a47f607a1`);
     let data = await res.json();
 
     let citySelect = document.getElementById("city");
@@ -18,10 +21,13 @@ async function loadCities() {
     data.features.forEach(place => {
       let city = place.properties.city || "";
       let state = place.properties.state || "";
-      let country = place.properties.country || "";
+      let countryName = place.properties.country || "";
+
+      // ❌ empty entries skip
+      if (!city) return;
 
       let option = document.createElement("option");
-      option.value = `${city}, ${state}, ${country}`;
+      option.value = `${city}, ${state}, ${countryName}`;
       option.text = `${city}, ${state}`;
 
       citySelect.appendChild(option);
