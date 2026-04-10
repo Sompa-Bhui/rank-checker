@@ -751,7 +751,7 @@ SERP_API_KEY = os.environ.get("SERP_API_KEY")
 
 # 👉 Local testing fallback
 if not SERP_API_KEY:
-    SERP_API_KEY = "YOUR_SERP_API_KEY_HERE"
+    SERP_API_KEY = "20518f671f85fe023c84f04664ebf78be13b63560729f225b395d6d099344154"
 
 usage_count = 0
 
