@@ -686,6 +686,60 @@
 
 
 
+# from flask import Flask, request, jsonify, render_template
+# import requests
+# import os
+
+# app = Flask(__name__)
+
+# SERP_API_KEY = os.environ.get("e8468c5e9a056abf61106e2ff915b4a19213d8d53cfa2a4397ab525b57fa8c18")
+
+# # simple usage counter (reset on deploy)
+# usage_count = 0
+
+# @app.route("/")
+# def home():
+#     return render_template("index.html")
+
+# @app.route("/api/rank")
+# def get_rank():
+#     global usage_count
+#     usage_count += 1
+
+#     keyword = request.args.get("keyword")
+#     domain = request.args.get("domain")
+#     location = request.args.get("location")
+#     device = request.args.get("device")
+
+#     url = "https://serpapi.com/search.json"
+
+#     params = {
+#         "q": keyword,
+#         "api_key": SERP_API_KEY,
+#         "location": location,
+#         "device": device
+#     }
+
+#     res = requests.get(url, params=params)
+#     data = res.json()
+
+#     rank = "Not found"
+
+#     if "organic_results" in data:
+#         for i, result in enumerate(data["organic_results"], start=1):
+#             if domain in result.get("link", ""):
+#                 rank = i
+#                 break
+
+#     return jsonify({
+#         "rank": rank,
+#         "usage": usage_count
+#     })
+
+# if __name__ == "__main__":
+#     app.run()
+
+
 from flask import Flask, request, jsonify, render_template
 import requests
 import os
@@ -694,7 +748,6 @@ app = Flask(__name__)
 
 SERP_API_KEY = os.environ.get("e8468c5e9a056abf61106e2ff915b4a19213d8d53cfa2a4397ab525b57fa8c18")
 
-# simple usage counter (reset on deploy)
 usage_count = 0
 
 @app.route("/")

@@ -7,15 +7,14 @@
 <body>
 
 <div class="container">
-
   <h2>Google Rank Checker</h2>
 
   <input id="keyword" placeholder="Enter keyword">
   <input id="domain" placeholder="Enter domain">
 
-  <select id="country" onchange="updateCities()">
-    <option value="us">USA</option>
-    <option value="ca">Canada</option>
+  <select id="country" onchange="loadCities()">
+    <option value="United States">USA</option>
+    <option value="Canada">Canada</option>
   </select>
 
   <select id="city"></select>
@@ -29,7 +28,6 @@
 
   <p id="usage"></p>
   <h3 id="result"></h3>
-
 </div>
 
 <script src="/static/script.js"></script>
