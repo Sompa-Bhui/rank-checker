@@ -1,7 +1,7 @@
 async function loadCities() {
   let country = document.getElementById("country").value;
 
-  let res = await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${country}&type=city&limit=10&apiKey=YOUR_API_KEY`);
+  let res = await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${country}&type=city&limit=10&apiKey=9b035938a53443d4bf651c7a47f607a1`);
   let data = await res.json();
 
   let citySelect = document.getElementById("city");
