@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rank Checker</title>
+</head>
+<body>
+
+<h2>Google Rank Checker</h2>
+
+<input id="keyword" placeholder="Enter keyword">
+<input id="domain" placeholder="Enter domain">
+
+<button onclick="checkRank()">Check Rank</button>
+
+<p id="result"></p>
+
+<script>
+async function checkRank() {
+    let keyword = document.getElementById("keyword").value;
+    let domain = document.getElementById("domain").value;
+
+    let res = await fetch(`/api/rank?keyword=${keyword}&domain=${domain}`);
+    let data = await res.json();
+
+    document.getElementById("result").innerText = "Rank: " + data.rank;
+}
+</script>
+
+</body>
+</html>
