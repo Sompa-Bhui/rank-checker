@@ -1,35 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Rank Checker</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
 
 <div class="container">
-  <h2>Google Rank Checker</h2>
+  <h2>🚀 Google Rank Checker</h2>
 
   <input id="keyword" placeholder="Enter keyword">
   <input id="domain" placeholder="Enter domain">
 
+  <!-- Country -->
   <select id="country" onchange="loadCities()">
-    <option value="United States">USA</option>
-    <option value="Canada">Canada</option>
+    <option value="United States">🇺🇸 USA</option>
+    <option value="Canada">🇨🇦 Canada</option>
   </select>
 
-  <select id="city"></select>
+  <!-- City -->
+  <select id="city">
+    <option>Loading cities...</option>
+  </select>
 
+  <!-- Device -->
   <select id="device">
-    <option value="desktop">Desktop</option>
-    <option value="mobile">Mobile</option>
+    <option value="desktop">💻 Desktop</option>
+    <option value="mobile">📱 Mobile</option>
   </select>
 
   <button onclick="checkRank()">Check Rank</button>
 
-  <p id="usage"></p>
-  <h3 id="result"></h3>
+  <!-- RESULT SECTION -->
+  <div class="result-box">
+    <p id="usage"></p>
+    <h3 id="result"></h3>
+  </div>
+
 </div>
 
 <script src="/static/script.js"></script>
+
 </body>
 </html>
