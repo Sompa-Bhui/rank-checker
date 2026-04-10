@@ -1,12 +1,12 @@
 async function loadCities() {
   let country = document.getElementById("country").value;
 
-  // country code fix
+  // country code
   let countryCode = country === "United States" ? "us" : "ca";
 
   try {
     let res = await fetch(
-      `https://api.geoapify.com/v1/geocode/autocomplete?text=&filter=countrycode:${countryCode}&type=city&limit=20&apiKey=9b035938a53443d4bf651c7a47f607a1`
+      `https://api.geoapify.com/v1/geocode/autocomplete?text=${country}&filter=countrycode:${countryCode}&type=city&limit=20&apiKey=9b035938a53443d4bf651c7a47f607a1`
     );
 
     let data = await res.json();
@@ -64,5 +64,5 @@ async function checkRank() {
 }
 
 
-// page load pe auto run
+// auto load
 window.onload = loadCities;
