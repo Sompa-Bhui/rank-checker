@@ -546,19 +546,87 @@
 
 
 
+# from flask import Flask, request, jsonify, render_template
+# import requests
+
+# app = Flask(__name__)
+
+# API_KEY = "YOUR_API_KEY_HERE"  # 👈 apni SerpApi key daal
+
+# def get_rank(keyword, domain):
+#     url = "https://serpapi.com/search.json"
+
+#     params = {
+#         "q": keyword,
+#         "location": "India",   # change kar sakti hai
+#         "gl": "in",
+#         "hl": "en",
+#         "engine": "google",
+#         "num": 100,
+#         "api_key": API_KEY
+#     }
+
+#     response = requests.get(url, params=params)
+
+#     if response.status_code != 200:
+#         print("API Error:", response.status_code)
+#         print(response.text)
+#         return -1
+
+#     data = response.json()
+#     results = data.get("organic_results", [])
+
+#     for result in results:
+#         link = result.get("link", "")
+#         position = result.get("position", 0)
+
+#         if domain.lower() in link.lower():
+#             return position
+
+#     return "Not found"
+
+
+# # 👇 homepage (HTML serve karega)
+# @app.route("/")
+# def home():
+#     return render_template("index.html")
+
+
+# # 👇 API route
+# @app.route("/api/rank")
+# def rank():
+#     keyword = request.args.get("keyword")
+#     domain = request.args.get("domain")
+
+#     result = get_rank(keyword, domain)
+
+#     return jsonify({
+#         "keyword": keyword,
+#         "domain": domain,
+#         "rank": result
+#     })
+
+
+# if __name__ == "__main__":
+#     app.run(debug=True)
+
+
+
+
 from flask import Flask, request, jsonify, render_template
 import requests
 
 app = Flask(__name__)
 
-API_KEY = "YOUR_API_KEY_HERE"  # 👈 apni SerpApi key daal
+API_KEY = "e8468c5e9a056abf61106e2ff915b4a19213d8d53cfa2a4397ab525b57fa8c18"  
+
 
 def get_rank(keyword, domain):
     url = "https://serpapi.com/search.json"
 
     params = {
         "q": keyword,
-        "location": "India",   # change kar sakti hai
+        "location": "India",
         "gl": "in",
         "hl": "en",
         "engine": "google",
@@ -566,37 +634,43 @@ def get_rank(keyword, domain):
         "api_key": API_KEY
     }
 
-    response = requests.get(url, params=params)
+    try:
+        response = requests.get(url, params=params)
 
-    if response.status_code != 200:
-        print("API Error:", response.status_code)
-        print(response.text)
-        return -1
+        if response.status_code != 200:
+            return "API Error"
 
-    data = response.json()
-    results = data.get("organic_results", [])
+        data = response.json()
+        results = data.get("organic_results", [])
 
-    for result in results:
-        link = result.get("link", "")
-        position = result.get("position", 0)
+        for result in results:
+            link = result.get("link", "")
+            position = result.get("position", 0)
 
-        if domain.lower() in link.lower():
-            return position
+            if domain.lower() in link.lower():
+                return position
 
-    return "Not found"
+        return "Not found"
+
+    except Exception as e:
+        print("Error:", e)
+        return "Error"
 
 
-# 👇 homepage (HTML serve karega)
+# ✅ homepage
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# 👇 API route
+# ✅ API route
 @app.route("/api/rank")
 def rank():
     keyword = request.args.get("keyword")
     domain = request.args.get("domain")
+
+    if not keyword or not domain:
+        return jsonify({"error": "keyword and domain required"})
 
     result = get_rank(keyword, domain)
 
@@ -607,5 +681,4 @@ def rank():
     })
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+app = app
