@@ -746,14 +746,24 @@ import os
 
 app = Flask(__name__)
 
-SERP_API_KEY = os.environ.get("e8468c5e9a056abf61106e2ff915b4a19213d8d53cfa2a4397ab525b57fa8c18")
+# ✅ Vercel env variable (production)
+SERP_API_KEY = os.environ.get("SERP_API_KEY")
 
+# 👉 Local testing ke liye fallback
+if not SERP_API_KEY:
+    SERP_API_KEY = "20518f671f85fe023c84f04664ebf78be13b63560729f225b395d6d099344154"  
+
+# simple usage counter
 usage_count = 0
 
+
+# ✅ Homepage
 @app.route("/")
 def home():
     return render_template("index.html")
 
+
+# ✅ Rank API
 @app.route("/api/rank")
 def get_rank():
     global usage_count
@@ -764,30 +774,54 @@ def get_rank():
     location = request.args.get("location")
     device = request.args.get("device")
 
+    if not keyword or not domain or not location or not device:
+        return jsonify({"error": "Missing parameters"})
+
     url = "https://serpapi.com/search.json"
 
+    # 🔥 COUNTRY DETECTION (IMPORTANT)
+    if "United States" in location:
+        gl = "us"
+    else:
+        gl = "ca"
+
+    # ✅ FINAL ACCURATE PARAMS
     params = {
         "q": keyword,
         "api_key": SERP_API_KEY,
-        "location": location,
-        "device": device
+        "location": location,      # city-level accuracy
+        "gl": gl,                  # country fix
+        "hl": "en",                # language
+        "device": device,          # mobile/desktop
+        "engine": "google",
+        "num": 100                 # top 100 results
     }
 
-    res = requests.get(url, params=params)
-    data = res.json()
+    try:
+        res = requests.get(url, params=params)
+        data = res.json()
 
-    rank = "Not found"
+        rank = "Not found"
 
-    if "organic_results" in data:
-        for i, result in enumerate(data["organic_results"], start=1):
-            if domain in result.get("link", ""):
-                rank = i
-                break
+        if "organic_results" in data:
+            for result in data["organic_results"]:
+                link = result.get("link", "")
+                position = result.get("position", 0)
 
-    return jsonify({
-        "rank": rank,
-        "usage": usage_count
-    })
+                if domain.lower() in link.lower():
+                    rank = position
+                    break
 
-if __name__ == "__main__":
-    app.run()
+        return jsonify({
+            "rank": rank,
+            "usage": usage_count
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        })
+
+
+# ❌ Vercel ke liye app.run() nahi chahiye
+app = app
