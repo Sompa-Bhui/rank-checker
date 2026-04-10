@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
   <title>Rank Checker</title>
@@ -19,6 +19,41 @@
   </select>
 
   <!-- Device -->
+  <select id="device">
+    <option value="desktop">💻 Desktop</option>
+    <option value="mobile">📱 Mobile</option>
+  </select>
+
+  <button onclick="checkRank()">Check Rank</button>
+
+  <p id="usage"></p>
+  <h3 id="result"></h3>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rank Checker</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>🚀 Rank Checker</h2>
+
+  <input id="keyword" placeholder="Enter keyword">
+  <input id="domain" placeholder="Enter domain">
+
+  <select id="location">
+    <option value="United States">🇺🇸 USA</option>
+    <option value="Canada">🇨🇦 Canada</option>
+  </select>
+
   <select id="device">
     <option value="desktop">💻 Desktop</option>
     <option value="mobile">📱 Mobile</option>

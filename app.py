@@ -740,18 +740,105 @@
 #     app.run()
 
 
+# from flask import Flask, request, jsonify, render_template
+# import requests
+# import os
+
+# app = Flask(__name__)
+
+# # ✅ Vercel env variable
+# SERP_API_KEY = os.environ.get("SERP_API_KEY")
+
+# # 👉 Local testing fallback
+# if not SERP_API_KEY:
+#     SERP_API_KEY = "20518f671f85fe023c84f04664ebf78be13b63560729f225b395d6d099344154"
+
+# usage_count = 0
+
+
+# @app.route("/")
+# def home():
+#     return render_template("index.html")
+
+
+# @app.route("/api/rank")
+# def get_rank():
+#     global usage_count
+#     usage_count += 1
+
+#     keyword = request.args.get("keyword")
+#     domain = request.args.get("domain")
+#     location = request.args.get("location")
+#     device = request.args.get("device")
+
+#     if not keyword or not domain or not location or not device:
+#         return jsonify({"error": "Missing parameters"})
+
+#     url = "https://serpapi.com/search.json"
+
+#     # 🔥 COUNTRY DETECTION
+#     if "United States" in location:
+#         gl = "us"
+#     else:
+#         gl = "ca"
+
+#     params = {
+#         "q": keyword,
+#         "api_key": SERP_API_KEY,
+#         "location": location,
+#         "gl": gl,
+#         "hl": "en",
+#         "device": device,
+#         "engine": "google",
+#         "num": 100
+#     }
+
+#     try:
+#         res = requests.get(url, params=params)
+#         data = res.json()
+
+#         # 🔍 DEBUG (optional)
+#         print("\n--- DEBUG RESULTS ---")
+#         if "organic_results" in data:
+#             for r in data["organic_results"][:20]:
+#                 print(r.get("position"), r.get("link"))
+
+#         rank = "Not found"
+
+#         if "organic_results" in data:
+#             for result in data["organic_results"]:
+#                 link = result.get("link", "")
+#                 position = result.get("position", 0)
+
+#                 if domain.lower() in link.lower():
+#                     rank = position
+#                     break
+
+#         return jsonify({
+#             "rank": rank,
+#             "usage": usage_count
+#         })
+
+#     except Exception as e:
+#         return jsonify({
+#             "error": str(e)
+#         })
+
+
+
+# app = app
+
+
 from flask import Flask, request, jsonify, render_template
 import requests
 import os
 
 app = Flask(__name__)
 
-# ✅ Vercel env variable
 SERP_API_KEY = os.environ.get("SERP_API_KEY")
 
-# 👉 Local testing fallback
 if not SERP_API_KEY:
-    SERP_API_KEY = "20518f671f85fe023c84f04664ebf78be13b63560729f225b395d6d099344154"
+    SERP_API_KEY = "YOUR_SERP_API_KEY_HERE"
 
 usage_count = 0
 
@@ -771,13 +858,10 @@ def get_rank():
     location = request.args.get("location")
     device = request.args.get("device")
 
-    if not keyword or not domain or not location or not device:
-        return jsonify({"error": "Missing parameters"})
+    if not keyword or not domain:
+        return jsonify({"error": "Missing input"})
 
-    url = "https://serpapi.com/search.json"
-
-    # 🔥 COUNTRY DETECTION
-    if "United States" in location:
+    if location == "United States":
         gl = "us"
     else:
         gl = "ca"
@@ -794,25 +878,38 @@ def get_rank():
     }
 
     try:
-        res = requests.get(url, params=params)
+        res = requests.get("https://serpapi.com/search.json", params=params)
         data = res.json()
 
-        # 🔍 DEBUG (optional)
-        print("\n--- DEBUG RESULTS ---")
-        if "organic_results" in data:
-            for r in data["organic_results"][:20]:
-                print(r.get("position"), r.get("link"))
-
         rank = "Not found"
+        position = 1
 
-        if "organic_results" in data:
-            for result in data["organic_results"]:
-                link = result.get("link", "")
-                position = result.get("position", 0)
-
+        # 🔴 Ads
+        if "ads" in data:
+            for ad in data["ads"]:
+                link = ad.get("link", "")
                 if domain.lower() in link.lower():
                     rank = position
                     break
+                position += 1
+
+        # 🟡 Maps / Local
+        if rank == "Not found" and "local_results" in data:
+            for local in data["local_results"]:
+                link = local.get("website", "")
+                if link and domain.lower() in link.lower():
+                    rank = position
+                    break
+                position += 1
+
+        # 🟢 Organic
+        if rank == "Not found" and "organic_results" in data:
+            for result in data["organic_results"]:
+                link = result.get("link", "")
+                if link and domain.lower() in link.lower():
+                    rank = position
+                    break
+                position += 1
 
         return jsonify({
             "rank": rank,
@@ -820,10 +917,7 @@ def get_rank():
         })
 
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        })
-
+        return jsonify({"error": str(e)})
 
 
 app = app

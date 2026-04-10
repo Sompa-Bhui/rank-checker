@@ -1,4 +1,4 @@
-body {
+/* body {
   margin: 0;
   font-family: Arial;
   background: linear-gradient(135deg, #1e3c72, #2a5298);
@@ -53,4 +53,53 @@ button:hover {
 #usage {
   margin-top: 10px;
   color: #555;
+} */
+
+
+
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 380px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #2a5298;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1e3c72;
+}
+
+#result {
+  margin-top: 15px;
+  font-size: 22px;
+  color: green;
 }
