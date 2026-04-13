@@ -796,13 +796,88 @@
 # app = app
 
 
+# from flask import Flask, request, jsonify, render_template
+# import requests
+# import os
+
+# app = Flask(__name__)
+
+# SERP_API_KEY = "f035c109e74ad65d5eba9f9d9e26646987cd2b7ac1f0e3d355b0cda742a7b3ed"
+
+# @app.route("/")
+# def home():
+#     return render_template("index.html")
+
+# @app.route("/api/rank")
+# def get_rank():
+#     keyword = request.args.get("keyword", "").strip()
+#     domain = request.args.get("domain", "").strip()
+#     location = request.args.get("location", "United States")
+
+#     # domain clean karo
+#     domain = domain.replace("https://", "").replace("http://", "").replace("www.", "").lower().strip("/")
+
+#     if location == "United States":
+#         gl = "us"
+#         loc = "United States"
+#     else:
+#         gl = "ca"
+#         loc = "Canada"
+
+#     params = {
+#         "q": keyword,
+#         "api_key": SERP_API_KEY,
+#         "location": loc,
+#         "gl": gl,
+#         "hl": "en",
+#         "num": 100,
+#         "engine": "google"
+#     }
+
+#     try:
+#         res = requests.get("https://serpapi.com/search.json", params=params)
+#         data = res.json()
+
+#         rank = "Not found"
+#         position = 1
+
+#         # 1. Ads
+#         for ad in data.get("ads", []):
+#             link = ad.get("link", "")
+#             if domain in link.lower().replace("www.", ""):
+#                 return jsonify({"rank": position, "type": "Ad"})
+#             position += 1
+
+#         # 2. Local / Maps
+#         for item in data.get("local_results", []):
+#             link = item.get("website", "")
+#             if link and domain in link.lower().replace("www.", ""):
+#                 return jsonify({"rank": position, "type": "Map"})
+#             position += 1
+
+#         # 3. Organic
+#         for item in data.get("organic_results", []):
+#             link = item.get("link", "")
+#             if domain in link.lower().replace("www.", ""):
+#                 return jsonify({"rank": position, "type": "Organic"})
+#             position += 1
+
+#         return jsonify({"rank": "Not found", "type": "-"})
+
+#     except Exception as e:
+#         return jsonify({"rank": "Error", "error": str(e)})
+
+# if __name__ == "__main__":
+#     app.run(debug=True)
+
+
 from flask import Flask, request, jsonify, render_template
 import requests
-import os
 
 app = Flask(__name__)
 
-SERP_API_KEY = "f035c109e74ad65d5eba9f9d9e26646987cd2b7ac1f0e3d355b0cda742a7b3ed"
+LOGIN = "bhuisompa001@gmail.com"
+PASSWORD = "f9f30662ddf8d427"
 
 @app.route("/")
 def home():
@@ -814,57 +889,68 @@ def get_rank():
     domain = request.args.get("domain", "").strip()
     location = request.args.get("location", "United States")
 
-    # domain clean karo
     domain = domain.replace("https://", "").replace("http://", "").replace("www.", "").lower().strip("/")
 
     if location == "United States":
-        gl = "us"
-        loc = "United States"
+        location_code = 2840
     else:
-        gl = "ca"
-        loc = "Canada"
+        location_code = 2124
 
-    params = {
-        "q": keyword,
-        "api_key": SERP_API_KEY,
-        "location": loc,
-        "gl": gl,
-        "hl": "en",
-        "num": 100,
-        "engine": "google"
-    }
+    url = "https://api.dataforseo.com/v3/serp/google/organic/live/advanced"
+    payload = [{
+        "keyword": keyword,
+        "location_code": location_code,
+        "language_code": "en",
+        "depth": 100,
+        "device": "desktop",
+        "os": "windows"
+    }]
 
     try:
-        res = requests.get("https://serpapi.com/search.json", params=params)
+        res = requests.post(url, json=payload, auth=(LOGIN, PASSWORD))
         data = res.json()
+        print("RESULT:", data)
 
-        rank = "Not found"
+        tasks = data.get("tasks", [])
+        if not tasks:
+            return jsonify({"rank": "Error", "error": "No tasks"})
+
+        result = tasks[0].get("result")
+        if not result:
+            msg = tasks[0].get("status_message", "No result")
+            return jsonify({"rank": "Error", "error": msg})
+
+        items = result[0].get("items", [])
+        if not items:
+            return jsonify({"rank": "Not found", "type": "-"})
+
         position = 1
+        for item in items:
+            item_type = item.get("type", "")
 
-        # 1. Ads
-        for ad in data.get("ads", []):
-            link = ad.get("link", "")
-            if domain in link.lower().replace("www.", ""):
-                return jsonify({"rank": position, "type": "Ad"})
-            position += 1
+            if item_type == "organic":
+                link = item.get("url", "")
+                if domain in link.lower().replace("www.", ""):
+                    return jsonify({"rank": position, "type": "Organic"})
+                position += 1
 
-        # 2. Local / Maps
-        for item in data.get("local_results", []):
-            link = item.get("website", "")
-            if link and domain in link.lower().replace("www.", ""):
-                return jsonify({"rank": position, "type": "Map"})
-            position += 1
+            elif item_type == "local_pack":
+                for local in item.get("items", []):
+                    link = local.get("url", "") or local.get("domain", "")
+                    if link and domain in link.lower().replace("www.", ""):
+                        return jsonify({"rank": position, "type": "Map"})
+                    position += 1
 
-        # 3. Organic
-        for item in data.get("organic_results", []):
-            link = item.get("link", "")
-            if domain in link.lower().replace("www.", ""):
-                return jsonify({"rank": position, "type": "Organic"})
-            position += 1
+            elif item_type == "paid":
+                link = item.get("url", "")
+                if domain in link.lower().replace("www.", ""):
+                    return jsonify({"rank": position, "type": "Ad"})
+                position += 1
 
         return jsonify({"rank": "Not found", "type": "-"})
 
     except Exception as e:
+        print("ERROR:", str(e))
         return jsonify({"rank": "Error", "error": str(e)})
 
 if __name__ == "__main__":
