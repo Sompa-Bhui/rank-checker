@@ -1,40 +1,29 @@
 async function checkRank() {
-  let keyword = document.getElementById("keyword").value.trim();
+  const keyword = document.getElementById("keyword").value.trim();
+  const location = document.getElementById("location").value;
   let domain = document.getElementById("domain").value.trim();
-  let location = document.getElementById("location").value;
 
-  // ❗ Validation
   if (!keyword || !domain) {
-    alert("Enter keyword & domain");
+    alert("Keyword aur domain dono bharo");
     return;
   }
 
-  // 🔥 DOMAIN CLEAN (IMPORTANT)
-  domain = domain
-    .replace("https://", "")
-    .replace("http://", "")
-    .replace("www.", "")
-    .replace("/", "")
-    .toLowerCase();
+  domain = domain.replace("https://","").replace("http://","").replace("www.","").replace("/","").toLowerCase();
 
-  document.getElementById("result").innerText = "Checking...";
+  document.getElementById("result").innerHTML = "Checking...";
 
   try {
-    let res = await fetch(
-      `/api/rank?keyword=${encodeURIComponent(keyword)}&domain=${encodeURIComponent(domain)}&location=${encodeURIComponent(location)}`
-    );
+    const res = await fetch(`/api/rank?keyword=${encodeURIComponent(keyword)}&domain=${encodeURIComponent(domain)}&location=${encodeURIComponent(location)}`);
+    const data = await res.json();
 
-    let data = await res.json();
-
-    // 🧠 SAFE OUTPUT
-    if (data.rank) {
-      document.getElementById("result").innerText = "Rank: " + data.rank;
+    if (data.rank === "Not found") {
+      document.getElementById("result").innerHTML = `<span class="notfound">Not found in top 100</span>`;
+    } else if (data.rank === "Error") {
+      document.getElementById("result").innerHTML = `<span class="error">Error: ${data.error}</span>`;
     } else {
-      document.getElementById("result").innerText = "Rank: Not found";
+      document.getElementById("result").innerHTML = `<span class="rank">Rank: ${data.rank}</span><span class="type">${data.type}</span>`;
     }
-
-  } catch (error) {
-    console.error(error);
-    document.getElementById("result").innerText = "Error fetching data";
+  } catch (e) {
+    document.getElementById("result").innerHTML = `<span class="error">Something went wrong</span>`;
   }
 }

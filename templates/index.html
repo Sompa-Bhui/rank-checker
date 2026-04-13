@@ -5,30 +5,17 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
 <div class="container">
-  <h2>🚀 Google Rank Checker</h2>
-
-  <!-- Keyword -->
-  <input id="keyword" placeholder="Enter keyword (e.g. facebook)">
-
-  <!-- Domain -->
-  <input id="domain" placeholder="Enter domain (e.g. facebook.com)">
-
-  <!-- Location -->
+  <h2>Google Rank Checker</h2>
+  <input id="keyword" placeholder="Keyword (e.g. facebook)">
+  <input id="domain" placeholder="Domain (e.g. facebook.com)">
   <select id="location">
-    <option value="United States">🇺🇸 USA</option>
-    <option value="Canada">🇨🇦 Canada</option>
+    <option value="United States">USA</option>
+    <option value="Canada">Canada</option>
   </select>
-
-  <!-- Button -->
   <button onclick="checkRank()">Check Rank</button>
-
-  <!-- Result -->
-  <h3 id="result">Rank: -</h3>
+  <div id="result"></div>
 </div>
-
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-
 </body>
 </html>

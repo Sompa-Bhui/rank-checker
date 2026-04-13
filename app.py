@@ -798,69 +798,74 @@
 
 from flask import Flask, request, jsonify, render_template
 import requests
+import os
 
 app = Flask(__name__)
 
-# 🔑 DataForSEO credentials
-LOGIN = "bhuisompa001@gmail.com"
-PASSWORD = "290727ca6bb72d0a"
-
+SERP_API_KEY = "f035c109e74ad65d5eba9f9d9e26646987cd2b7ac1f0e3d355b0cda742a7b3ed"
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
 @app.route("/api/rank")
 def get_rank():
-    keyword = request.args.get("keyword")
-    domain = request.args.get("domain")
-    location = request.args.get("location")
+    keyword = request.args.get("keyword", "").strip()
+    domain = request.args.get("domain", "").strip()
+    location = request.args.get("location", "United States")
 
-    # 🌍 LOCATION FIX
+    # domain clean karo
+    domain = domain.replace("https://", "").replace("http://", "").replace("www.", "").lower().strip("/")
+
     if location == "United States":
-        location_code = 2840
+        gl = "us"
+        loc = "United States"
     else:
-        location_code = 2124
+        gl = "ca"
+        loc = "Canada"
 
-    # 🔥 IMPORTANT: ADVANCED ENDPOINT
-    url = "https://api.dataforseo.com/v3/serp/google/organic/live/advanced"
-
-    payload = [{
-        "keyword": keyword,
-        "location_code": location_code,
-        "language_code": "en",
-        "depth": 100
-    }]
+    params = {
+        "q": keyword,
+        "api_key": SERP_API_KEY,
+        "location": loc,
+        "gl": gl,
+        "hl": "en",
+        "num": 100,
+        "engine": "google"
+    }
 
     try:
-        response = requests.post(url, json=payload, auth=(LOGIN, PASSWORD))
-        data = response.json()
+        res = requests.get("https://serpapi.com/search.json", params=params)
+        data = res.json()
 
         rank = "Not found"
+        position = 1
 
-        tasks = data.get("tasks", [])
-        if tasks and tasks[0].get("result"):
+        # 1. Ads
+        for ad in data.get("ads", []):
+            link = ad.get("link", "")
+            if domain in link.lower().replace("www.", ""):
+                return jsonify({"rank": position, "type": "Ad"})
+            position += 1
 
-            items = tasks[0]["result"][0].get("items", [])
+        # 2. Local / Maps
+        for item in data.get("local_results", []):
+            link = item.get("website", "")
+            if link and domain in link.lower().replace("www.", ""):
+                return jsonify({"rank": position, "type": "Map"})
+            position += 1
 
-            position = 1
-            for item in items:
+        # 3. Organic
+        for item in data.get("organic_results", []):
+            link = item.get("link", "")
+            if domain in link.lower().replace("www.", ""):
+                return jsonify({"rank": position, "type": "Organic"})
+            position += 1
 
-                # 🔥 ADVANCED FIX (url + domain check)
-                link = item.get("url") or item.get("domain", "")
-
-                if link and domain.lower() in link.lower():
-                    rank = position
-                    break
-
-                position += 1
-
-        return jsonify({"rank": rank})
+        return jsonify({"rank": "Not found", "type": "-"})
 
     except Exception as e:
-        print("ERROR:", e)
-        return jsonify({"rank": "Error"})
+        return jsonify({"rank": "Error", "error": str(e)})
 
-
-app = app
+if __name__ == "__main__":
+    app.run(debug=True)
