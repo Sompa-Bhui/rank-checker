@@ -817,13 +817,14 @@ def get_rank():
     domain = request.args.get("domain")
     location = request.args.get("location")
 
-    # 🌍 FIXED LOCATION
+    # 🌍 LOCATION FIX
     if location == "United States":
-        location_code = 2840  # USA
+        location_code = 2840
     else:
-        location_code = 2124  # Canada
+        location_code = 2124
 
-    url = "https://api.dataforseo.com/v3/serp/google/organic/live/regular"
+    # 🔥 IMPORTANT: ADVANCED ENDPOINT
+    url = "https://api.dataforseo.com/v3/serp/google/organic/live/advanced"
 
     payload = [{
         "keyword": keyword,
@@ -836,7 +837,6 @@ def get_rank():
         response = requests.post(url, json=payload, auth=(LOGIN, PASSWORD))
         data = response.json()
 
-        # 🧠 SAFE PARSING
         rank = "Not found"
 
         tasks = data.get("tasks", [])
@@ -846,15 +846,20 @@ def get_rank():
 
             position = 1
             for item in items:
-                link = item.get("url", "")
+
+                # 🔥 ADVANCED FIX (url + domain check)
+                link = item.get("url") or item.get("domain", "")
+
                 if link and domain.lower() in link.lower():
                     rank = position
                     break
+
                 position += 1
 
         return jsonify({"rank": rank})
 
     except Exception as e:
+        print("ERROR:", e)
         return jsonify({"rank": "Error"})
 
 
