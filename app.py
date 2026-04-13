@@ -742,18 +742,12 @@
 
 from flask import Flask, request, jsonify, render_template
 import requests
-import os
 
 app = Flask(__name__)
 
-# ✅ Vercel env variable
-SERP_API_KEY = os.environ.get("SERP_API_KEY")
-
-# 👉 Local testing fallback
-if not SERP_API_KEY:
-    SERP_API_KEY = "YOUR_SERP_API_KEY_HERE"
-
-usage_count = 0
+# 🔑 DataForSEO credentials
+LOGIN = "YOUR_EMAIL"
+PASSWORD = "YOUR_PASSWORD"
 
 
 @app.route("/")
@@ -763,67 +757,40 @@ def home():
 
 @app.route("/api/rank")
 def get_rank():
-    global usage_count
-    usage_count += 1
-
     keyword = request.args.get("keyword")
     domain = request.args.get("domain")
     location = request.args.get("location")
-    device = request.args.get("device")
 
-    if not keyword or not domain or not location or not device:
-        return jsonify({"error": "Missing parameters"})
+    url = "https://api.dataforseo.com/v3/serp/google/organic/live/regular"
 
-    url = "https://serpapi.com/search.json"
-
-    # 🔥 COUNTRY DETECTION
-    if "United States" in location:
-        gl = "us"
-    else:
-        gl = "ca"
-
-    params = {
-        "q": keyword,
-        "api_key": SERP_API_KEY,
-        "location": location,
-        "gl": gl,
-        "hl": "en",
-        "device": device,
-        "engine": "google",
-        "num": 100
-    }
+    payload = [{
+        "keyword": keyword,
+        "location_name": location,
+        "language_code": "en",
+        "depth": 100
+    }]
 
     try:
-        res = requests.get(url, params=params)
-        data = res.json()
-
-        # 🔍 DEBUG (optional)
-        print("\n--- DEBUG RESULTS ---")
-        if "organic_results" in data:
-            for r in data["organic_results"][:20]:
-                print(r.get("position"), r.get("link"))
+        response = requests.post(url, json=payload, auth=(LOGIN, PASSWORD))
+        data = response.json()
 
         rank = "Not found"
 
-        if "organic_results" in data:
-            for result in data["organic_results"]:
-                link = result.get("link", "")
-                position = result.get("position", 0)
+        results = data["tasks"][0]["result"][0]["items"]
 
-                if domain.lower() in link.lower():
-                    rank = position
-                    break
+        position = 1
 
-        return jsonify({
-            "rank": rank,
-            "usage": usage_count
-        })
+        for item in results:
+            link = item.get("url", "")
+            if domain.lower() in link.lower():
+                rank = position
+                break
+            position += 1
+
+        return jsonify({"rank": rank})
 
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        })
+        return jsonify({"error": str(e)})
 
 
-# ❌ Vercel ke liye run nahi chahiye
 app = app

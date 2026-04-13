@@ -10,11 +10,11 @@ body {
 
 .container {
   background: white;
-  padding: 35px;
+  padding: 30px;
   border-radius: 12px;
-  width: 400px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  width: 350px;
   text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 h2 {
@@ -23,7 +23,7 @@ h2 {
 
 input, select {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   margin: 8px 0;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -31,12 +31,11 @@ input, select {
 
 button {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   background: #2a5298;
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
   cursor: pointer;
 }
 
@@ -49,8 +48,3 @@ button:hover {
   font-size: 22px;
   color: green;
 }
-
-#usage {
-  margin-top: 10px;
-  color: #555;
-} 

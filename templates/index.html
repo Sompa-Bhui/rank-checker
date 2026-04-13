@@ -1,8 +1,8 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Rank Checker</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
@@ -12,24 +12,17 @@
   <input id="keyword" placeholder="Enter keyword">
   <input id="domain" placeholder="Enter domain">
 
-  <!-- Location -->
   <select id="location">
-    <option value="Miami, Florida, United States">🇺🇸 Florida (USA)</option>
-    <option value="Cambridge, Ontario, Canada">🇨🇦 Cambridge (Canada)</option>
-  </select>
-
-  <!-- Device -->
-  <select id="device">
-    <option value="desktop">💻 Desktop</option>
-    <option value="mobile">📱 Mobile</option>
+    <option value="United States">🇺🇸 USA</option>
+    <option value="Canada">🇨🇦 Canada</option>
   </select>
 
   <button onclick="checkRank()">Check Rank</button>
 
-  <p id="usage"></p>
   <h3 id="result"></h3>
 </div>
 
-<script src="/static/script.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
-</html> -->
+</html>
