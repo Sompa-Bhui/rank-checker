@@ -746,8 +746,8 @@ import requests
 app = Flask(__name__)
 
 # 🔑 DataForSEO credentials
-LOGIN = "YOUR_EMAIL"
-PASSWORD = "YOUR_PASSWORD"
+LOGIN = "bhuisompa001@gmail.com"
+PASSWORD = "290727ca6bb72d0a"
 
 
 @app.route("/")
