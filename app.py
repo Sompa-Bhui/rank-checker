@@ -801,6 +801,7 @@ import requests
 
 app = Flask(__name__)
 
+# 🔑 DataForSEO credentials
 LOGIN = "bhuisompa001@gmail.com"
 PASSWORD = "290727ca6bb72d0a"
 
@@ -816,11 +817,17 @@ def get_rank():
     domain = request.args.get("domain")
     location = request.args.get("location")
 
+    # 🌍 FIXED LOCATION
+    if location == "United States":
+        location_code = 2840  # USA
+    else:
+        location_code = 2124  # Canada
+
     url = "https://api.dataforseo.com/v3/serp/google/organic/live/regular"
 
     payload = [{
         "keyword": keyword,
-        "location_name": location,
+        "location_code": location_code,
         "language_code": "en",
         "depth": 100
     }]
@@ -829,9 +836,7 @@ def get_rank():
         response = requests.post(url, json=payload, auth=(LOGIN, PASSWORD))
         data = response.json()
 
-        # 🔍 DEBUG (temporary)
-        print(data)
-
+        # 🧠 SAFE PARSING
         rank = "Not found"
 
         tasks = data.get("tasks", [])
@@ -851,3 +856,6 @@ def get_rank():
 
     except Exception as e:
         return jsonify({"rank": "Error"})
+
+
+app = app

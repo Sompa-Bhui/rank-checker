@@ -9,17 +9,23 @@
 <div class="container">
   <h2>🚀 Google Rank Checker</h2>
 
-  <input id="keyword" placeholder="Enter keyword">
-  <input id="domain" placeholder="Enter domain">
+  <!-- Keyword -->
+  <input id="keyword" placeholder="Enter keyword (e.g. facebook)">
 
+  <!-- Domain -->
+  <input id="domain" placeholder="Enter domain (e.g. facebook.com)">
+
+  <!-- Location -->
   <select id="location">
     <option value="United States">🇺🇸 USA</option>
     <option value="Canada">🇨🇦 Canada</option>
   </select>
 
+  <!-- Button -->
   <button onclick="checkRank()">Check Rank</button>
 
-  <h3 id="result"></h3>
+  <!-- Result -->
+  <h3 id="result">Rank: -</h3>
 </div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
